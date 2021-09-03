@@ -1,8 +1,8 @@
-import { Mesh, MeshBasicMaterial, SphereBufferGeometry, Vector3 } from "three";
+import { BufferGeometry, Float32BufferAttribute, Points, PointsMaterial, Vector3 } from "three";
 
-export class Airport extends Mesh {
+export class Airport extends Points {
   constructor(pos: Vector3) {
-    super(new SphereBufferGeometry(1, 32, 32), new MeshBasicMaterial({ color: 'red' }));
-    this.position.copy(pos);
+    super(new BufferGeometry(), new PointsMaterial({ color: 'red', size: 5 }));
+    this.geometry.setAttribute('position', new Float32BufferAttribute(pos.toArray(), 3));
   }
 }
