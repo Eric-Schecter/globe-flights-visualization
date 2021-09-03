@@ -15,7 +15,7 @@ export class AirPorts extends Group {
   constructor(private radius: number) {
     super();
     this.getData()
-      .then(res => requestIdleCallback((deadline) => this.createAirport(deadline, res)));
+      .then(res => requestIdleCallback(deadline => this.createAirport(deadline, res)));
   }
   private getData = (): Promise<Data[]> => {
     return new Promise((resolve) => {
@@ -23,6 +23,7 @@ export class AirPorts extends Group {
       worker.postMessage('message');
       worker.addEventListener('message', ({ data }: { data: Data[] }) => {
         resolve(data);
+        worker.terminate();
       })
     })
   }
