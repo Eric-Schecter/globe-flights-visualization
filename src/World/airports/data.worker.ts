@@ -32,7 +32,6 @@ ctx.addEventListener('message', async (e: { data: { radius: number } }) => {
     fetchData('/data/routes.json')
   ]).then(([nodes, links]: [MyNode[], Link[]]) => {
     const nodesWithPos = nodes.map(node => getPos(node, radius));
-    const filteredNodes = nodesWithPos.filter(node => node.country === 'China')
     const filteredLinks = links.filter(link => link.stops === '0');
     const linksWithNodes = filteredLinks
       .map(link => {
@@ -41,11 +40,11 @@ ctx.addEventListener('message', async (e: { data: { radius: number } }) => {
         return link;
       })
       .filter(link => {
-        const srcResult = (link as MyLink).srcAirport?.country === 'China';
-        const dstResult = (link as MyLink).dstAirport?.country === 'China';
+        const srcResult = (link as MyLink).srcAirport;
+        const dstResult = (link as MyLink).dstAirport;
         return srcResult && dstResult;
       });
-    return [filteredNodes, linksWithNodes];
+    return [nodesWithPos, linksWithNodes];
   })
   ctx.postMessage(data);
 })

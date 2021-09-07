@@ -7,6 +7,6 @@ const vec3 green = vec3(0.,1.,0.);
 
 void main()
 {
-    vec3 color = mix(green,red,vUv.x);
+    vec3 color = mix(green,red,fract(vUv.x + uTime));
     gl_FragColor=vec4(color,1.);
 }

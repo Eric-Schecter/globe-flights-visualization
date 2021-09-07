@@ -9,7 +9,7 @@ export class AirLine extends Mesh implements Tickable {
     const srcVec = new Vector3(...src);
     const dstVec = new Vector3(...dst);
     const points: Vector3[] = [];
-    const length = 20;
+    const length = 3;
     for (let i = 0; i <= length; i++) {
       const p = new Vector3().lerpVectors(srcVec, dstVec, i / length)
         .multiplyScalar(1 + 0.1 * Math.sin(i / length * Math.PI));

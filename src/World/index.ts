@@ -10,6 +10,9 @@ export class World {
   private loop: Loop;
   private resizer: Resizer;
   private lights: Lights;
+  private control: MyControl;
+  private pre = false;
+  private getProgress = () => '0/0';
 
   constructor(container: HTMLElement) {
     Cache.enabled = true;
@@ -22,14 +25,27 @@ export class World {
     this.resizer = new Resizer(this.renderer, this.camera, container);
     this.lights = new Lights();
     this.scene.add(...assets, ...this.lights.instance, this.camera);
-    this.loop = new Loop(this.renderer, this.scene, this.camera, []);
+    this.loop = new Loop(this.renderer, this.scene, this.camera, this);
     this.loop.start();
-    new MyControl(this.camera, canvas);
+    this.control = new MyControl(this.camera, canvas);
+  }
+  public changeRenderMode = (onDemand: boolean) => {
+    if (onDemand === this.pre) { return }
+    this.pre = onDemand;
+    if (onDemand) {
+      this.control.addEventListener('change', this.render);
+    } else {
+      this.control.removeEventListener('change', this.render);
+    }
+  }
+  private render = () => {
+    this.renderer.render(this.scene, this.camera);
   }
   private createAssets = () => {
     const radius = 300;
     const earth = new Earth(radius)
     const airports = new AirPorts(radius);
+    this.getProgress = airports.getProgress;
     return [earth, airports];
   }
   public dispose = () => {
@@ -41,5 +57,8 @@ export class World {
         component.traverse(com => com.dispatchEvent({ type: 'dispose' }));
       }
     })
+  }
+  public get progress() {
+    return this.getProgress
   }
 }
