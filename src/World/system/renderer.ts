@@ -6,7 +6,7 @@ export class MyRenderer extends WebGLRenderer {
     const { clientWidth: width, clientHeight: height } = container;
     this.toneMapping = ACESFilmicToneMapping;
     this.outputEncoding = sRGBEncoding;
-    this.debug.checkShaderErrors = false;
+    // this.debug.checkShaderErrors = false;
     this.physicallyCorrectLights = true;
     this.shadowMap.enabled = true;
     this.shadowMap.type = PCFSoftShadowMap;
