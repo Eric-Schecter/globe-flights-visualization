@@ -1,6 +1,6 @@
 import { Camera, Clock, Scene, WebGLRenderer } from "three";
-import { World } from "..";
 import { Tickable } from "../../shared/types";
+import { MyControl } from "./control";
 
 class MinUpdateFreq {
   private time = 0;
@@ -16,25 +16,41 @@ class MinUpdateFreq {
 }
 
 export class Loop {
+  private pre = false;
   private clock = new Clock();
   private minUpdateFreq = new MinUpdateFreq();
-  constructor(private renderer: WebGLRenderer, private scene: Scene, private camera: Camera,private world:World) { }
+  constructor(private renderer: WebGLRenderer, private scene: Scene, private camera: Camera, private control: MyControl) { }
+  public start = () => {
+    this.renderer.setAnimationLoop(() => {
+      const needsUpdate = this.minUpdateFreq.needsUpdate;
+      this.renderOndemand(needsUpdate);
+      if (!needsUpdate) {
+        this.renderContinuously();
+      }
+    });
+  }
   private tick = (delta: number) => {
     this.scene.traverse(obj => {
       const tickableObj = obj as Tickable;
       tickableObj.tick && tickableObj.tick(delta);
     })
   }
-  public start = () => {
-    this.renderer.setAnimationLoop(() => {
-      const needsUpdate = this.minUpdateFreq.needsUpdate;
-      this.world.changeRenderMode(needsUpdate);
-      if(!needsUpdate){
-        const delta = this.clock.getDelta();
-        this.tick(delta);
-        this.renderer.render(this.scene, this.camera);
-      }
-    });
+  private render = () => {
+    this.renderer.render(this.scene, this.camera);
+  }
+  public renderContinuously = () => {
+    const delta = this.clock.getDelta();
+    this.tick(delta);
+    this.render();
+  }
+  private renderOndemand = (ondemand: boolean) => {
+    if (ondemand === this.pre) { return }
+    this.pre = ondemand;
+    if (ondemand) {
+      this.control.addEventListener('change', this.render);
+    } else {
+      this.control.removeEventListener('change', this.render);
+    }
   }
   public stop = () => {
     this.renderer.setAnimationLoop(null);
